@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello, New Krew! - 나의 카카오 유니버스 적응 유형 찾기</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #FFF9F0;
+            --cream-dark: #F5EDE3;
+            --yellow: #FFE566;
+            --yellow-light: #FFF4CC;
+            --peach: #FFB5A7;
+            --peach-light: #FFD6CF;
+            --mint: #B8E0D4;
+            --mint-light: #D9F0EA;
+            --sky: #A7D1F0;
+            --sky-light: #D6ECFA;
+            --brown: #8B7355;
+            --brown-dark: #5C4D3D;
+            --text: #4A4A4A;
+            --text-light: #7A7A7A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Paw print background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(ellipse 8px 10px at 50% 50%, rgba(139, 115, 85, 0.06) 100%, transparent 100%),
+                radial-gradient(circle 4px at 35% 30%, rgba(139, 115, 85, 0.06) 100%, transparent 100%),
+                radial-gradient(circle 4px at 65% 30%, rgba(139, 115, 85, 0.06) 100%, transparent 100%),
+                radial-gradient(circle 3px at 25% 60%, rgba(139, 115, 85, 0.06) 100%, transparent 100%),
+                radial-gradient(circle 3px at 75% 60%, rgba(139, 115, 85, 0.06) 100%, transparent 100%);
+            background-size: 80px 80px;
+            background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Screen transitions */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease-out;
+            flex: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes wiggle {
+            0%, 100% {
+                transform: rotate(-3deg);
+            }
+            50% {
+                transform: rotate(3deg);
+            }
+        }
+
+        @keyframes pawPrint {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-20deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* Intro Screen */
+        .intro-screen {
+            justify-content: center;
+            padding-top: 40px;
+        }
+
+        .intro-image-container {
+            width: 100%;
+            max-width: 760px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(139, 115, 85, 0.15),
+                0 2px 8px rgba(139, 115, 85, 0.1);
+            animation: bounceIn 0.8s ease-out;
+            border: 4px solid white;
+        }
+
+        .intro-image {
+            width: 100%;
+            display: block;
+        }
+
+        .intro-content {
+            text-align: center;
+            margin-top: 32px;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        .intro-subtitle {
+            font-family: 'Jua', sans-serif;
+            font-size: 15px;
+            color: var(--brown);
+            background: linear-gradient(135deg, var(--yellow-light), var(--peach-light));
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .intro-description {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.7;
+            margin-bottom: 32px;
+            padding: 0 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Jua', sans-serif;
+            font-size: 20px;
+            padding: 16px 48px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--yellow), #FFD93D);
+            color: var(--brown-dark);
+            box-shadow:
+                0 6px 0 #D4A72C,
+                0 8px 20px rgba(255, 217, 61, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 0 #D4A72C,
+                0 12px 28px rgba(255, 217, 61, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow:
+                0 2px 0 #D4A72C,
+                0 4px 12px rgba(255, 217, 61, 0.3);
+        }
+
+        /* Decorative paw */
+        .paw-deco {
+            position: absolute;
+            font-size: 24px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .paw-deco.left {
+            left: 10%;
+            top: 15%;
+            animation-delay: 0s;
+        }
+
+        .paw-deco.right {
+            right: 10%;
+            top: 25%;
+            animation-delay: 0.5s;
+        }
+
+        /* Quiz Screen */
+        .quiz-screen {
+            padding-top: 20px;
+        }
+
+        .progress-container {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            color: var(--brown);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-paws {
+            display: flex;
+            gap: 8px;
+        }
+
+        .progress-paw {
+            font-size: 20px;
+            opacity: 0.3;
+            transition: all 0.4s ease;
+            filter: grayscale(1);
+        }
+
+        .progress-paw.filled {
+            opacity: 1;
+            filter: grayscale(0);
+            animation: pawPrint 0.4s ease-out;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--cream-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--peach), var(--yellow));
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '🐾';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .quiz-image-container {
+            width: 100%;
+            max-width: 760px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(139, 115, 85, 0.15),
+                0 2px 8px rgba(139, 115, 85, 0.1);
+            margin-bottom: 24px;
+            border: 4px solid white;
+            animation: bounceIn 0.6s ease-out;
+            position: relative;
+        }
+
+        .quiz-image {
+            width: 100%;
+            display: block;
+        }
+
+        /* Clickable image areas */
+        .image-choice-overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        .image-choice-overlay.choice-a {
+            left: 0;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .image-choice-overlay.choice-b {
+            right: 0;
+            border-radius: 0 16px 16px 0;
+        }
+
+        .image-choice-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-choice-overlay.choice-a::before {
+            background: linear-gradient(135deg, rgba(167, 209, 240, 0.4), rgba(184, 224, 212, 0.4));
+        }
+
+        .image-choice-overlay.choice-b::before {
+            background: linear-gradient(135deg, rgba(255, 181, 167, 0.4), rgba(255, 229, 102, 0.4));
+        }
+
+        /* hover 효과는 마우스가 있는 기기에서만 적용 (터치 기기 제외) */
+        @media (hover: hover) and (pointer: fine) {
+            .image-choice-overlay:hover::before {
+                opacity: 1;
+            }
+        }
+
+        .image-choice-overlay:active::before {
+            opacity: 1;
+        }
+
+        .image-choice-overlay:active {
+            transform: scale(0.98);
+        }
+
+        .choice-hint {
+            position: relative;
+            z-index: 1;
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .image-choice-overlay.choice-a .choice-hint {
+            background: linear-gradient(135deg, var(--sky), var(--mint));
+        }
+
+        .image-choice-overlay.choice-b .choice-hint {
+            background: linear-gradient(135deg, var(--peach), var(--yellow));
+        }
+
+        /* hover 효과는 마우스가 있는 기기에서만 적용 (터치 기기 제외) */
+        @media (hover: hover) and (pointer: fine) {
+            .image-choice-overlay:hover .choice-hint {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-choice-overlay:active .choice-hint {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Click ripple effect */
+        @keyframes clickRipple {
+            0% {
+                transform: scale(0);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .click-ripple {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            pointer-events: none;
+            animation: clickRipple 0.6s ease-out forwards;
+        }
+
+        .quiz-question {
+            font-family: 'Jua', sans-serif;
+            font-size: 16px;
+            color: var(--brown);
+            text-align: center;
+            margin-bottom: 12px;
+            padding: 0 10px;
+            animation: fadeIn 0.5s ease-out 0.2s both;
+        }
+
+        .quiz-instruction {
+            font-family: 'Jua', sans-serif;
+            font-size: 13px;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-out 0.3s both;
+        }
+
+        /* Hide text choices by default, show only on mobile if needed */
+        .choices-container {
+            display: none;
+        }
+
+        .choice-btn {
+            width: 100%;
+            padding: 20px 24px;
+            background: white;
+            border: 3px solid var(--cream-dark);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--yellow-light), var(--peach-light));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--yellow);
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(255, 229, 102, 0.3);
+        }
+
+        .choice-btn:hover::before {
+            opacity: 0.3;
+        }
+
+        .choice-btn:active {
+            transform: translateX(4px) scale(0.98);
+        }
+
+        .choice-label {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .choice-letter {
+            font-family: 'Jua', sans-serif;
+            font-size: 18px;
+            color: white;
+            background: linear-gradient(135deg, var(--peach), var(--yellow));
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+        }
+
+        .choice-btn:first-child .choice-letter {
+            background: linear-gradient(135deg, var(--sky), var(--mint));
+        }
+
+        .choice-text {
+            flex: 1;
+        }
+
+        .choice-title {
+            font-family: 'Jua', sans-serif;
+            font-size: 16px;
+            color: var(--brown-dark);
+            margin-bottom: 4px;
+        }
+
+        .choice-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            padding-top: 40px;
+            text-align: center;
+        }
+
+        .result-badge {
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            color: var(--brown);
+            background: linear-gradient(135deg, var(--yellow-light), var(--mint-light));
+            padding: 8px 24px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 16px;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        .result-title {
+            font-family: 'Jua', sans-serif;
+            font-size: 28px;
+            color: var(--brown-dark);
+            margin-bottom: 8px;
+            animation: bounceIn 0.6s ease-out 0.1s both;
+        }
+
+        .result-quote {
+            font-family: 'Jua', sans-serif;
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 24px;
+            animation: fadeIn 0.6s ease-out 0.2s both;
+        }
+
+        .result-image-container {
+            width: 100%;
+            max-width: 760px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow:
+                0 12px 40px rgba(139, 115, 85, 0.2),
+                0 4px 12px rgba(139, 115, 85, 0.1);
+            margin-bottom: 24px;
+            border: 4px solid white;
+            animation: bounceIn 0.8s ease-out 0.3s both;
+            position: relative;
+        }
+
+        .result-image {
+            width: 100%;
+            display: block;
+        }
+
+        .result-description {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+            animation: fadeIn 0.6s ease-out 0.4s both;
+        }
+
+        .result-desc-title {
+            font-family: 'Jua', sans-serif;
+            font-size: 16px;
+            color: var(--brown);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .result-desc-text {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.8;
+            text-align: left;
+        }
+
+        .result-tip {
+            background: linear-gradient(135deg, var(--yellow-light), var(--peach-light));
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+            animation: fadeIn 0.6s ease-out 0.5s both;
+        }
+
+        .result-tip-title {
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            color: var(--brown);
+            margin-bottom: 8px;
+        }
+
+        .result-tip-text {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, var(--mint), var(--sky));
+            color: var(--brown-dark);
+            box-shadow:
+                0 6px 0 #7BBFAF,
+                0 8px 20px rgba(184, 224, 212, 0.4);
+            animation: fadeIn 0.6s ease-out 0.6s both;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 0 #7BBFAF,
+                0 12px 28px rgba(184, 224, 212, 0.5);
+        }
+
+        .btn-restart:active {
+            transform: translateY(4px);
+            box-shadow:
+                0 2px 0 #7BBFAF,
+                0 4px 12px rgba(184, 224, 212, 0.3);
+        }
+
+        /* Floating decorations */
+        .floating-deco {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            font-size: 32px;
+            opacity: 0.15;
+        }
+
+        .deco-1 { top: 10%; left: 5%; animation: float 3s ease-in-out infinite; }
+        .deco-2 { top: 30%; right: 5%; animation: float 3.5s ease-in-out infinite 0.5s; }
+        .deco-3 { bottom: 20%; left: 8%; animation: float 4s ease-in-out infinite 1s; }
+        .deco-4 { bottom: 35%; right: 8%; animation: float 3.2s ease-in-out infinite 0.3s; }
+
+        /* Confetti animation for results */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+
+            .intro-subtitle {
+                font-size: 13px;
+            }
+
+            .btn {
+                font-size: 18px;
+                padding: 14px 40px;
+            }
+
+            .result-title {
+                font-size: 24px;
+            }
+
+            .choice-title {
+                font-size: 15px;
+            }
+
+            .choice-desc {
+                font-size: 12px;
+            }
+        }
+
+        /* Loading shimmer effect */
+        .shimmer {
+            background: linear-gradient(90deg,
+                var(--cream-dark) 0%,
+                var(--cream) 50%,
+                var(--cream-dark) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Share buttons */
+        .share-section {
+            margin-top: 24px;
+            animation: fadeIn 0.6s ease-out 0.4s both;
+        }
+
+        .share-title {
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .share-btn:active {
+            transform: translateY(0);
+        }
+
+        .share-btn-kakao {
+            background: #FEE500;
+            color: #191919;
+        }
+
+        .share-btn-copy {
+            background: white;
+            color: var(--brown-dark);
+            border: 2px solid var(--cream-dark);
+        }
+
+        .share-btn-copy:hover {
+            border-color: var(--mint);
+            background: var(--mint-light);
+        }
+
+        .share-btn-native {
+            background: linear-gradient(135deg, var(--sky), var(--mint));
+            color: var(--brown-dark);
+        }
+
+        .share-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--brown-dark);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-family: 'Jua', sans-serif;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Result screen share section */
+        .result-share-section {
+            margin-bottom: 24px;
+            animation: fadeIn 0.6s ease-out 0.55s both;
+        }
+
+        .result-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating decorations -->
+    <div class="floating-deco deco-1">🐱</div>
+    <div class="floating-deco deco-2">✨</div>
+    <div class="floating-deco deco-3">💛</div>
+    <div class="floating-deco deco-4">🐾</div>
+
+    <div class="container">
+        <!-- Intro Screen -->
+        <div class="screen intro-screen active" id="intro-screen">
+            <div class="intro-image-container">
+                <img src="intro.jpg" alt="Hello, New Krew!" class="intro-image">
+            </div>
+            <div class="intro-content">
+                <div class="intro-subtitle">🎮 5개의 질문으로 알아보는</div>
+                <p class="intro-description">
+                    간단한 밸런스 게임으로 나의 업무 스타일을 분석하고,<br>
+                    카카오 유니버스에서 나와 어울리는 K-크루 캐릭터를 찾아보세요!
+                </p>
+                <button class="btn btn-primary" onclick="startQuiz()">
+                    시작하기 🐾
+                </button>
+
+                <!-- Intro Share Section -->
+                <div class="share-section">
+                    <p class="share-title">친구에게 공유하기</p>
+                    <div class="share-buttons">
+                        <button class="share-btn share-btn-kakao" onclick="shareKakao('intro')">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.68 6.71l-.95 3.55c-.08.31.26.56.52.38l4.25-2.82c.49.06.99.09 1.5.09 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                            </svg>
+                            카카오톡
+                        </button>
+                        <button class="share-btn share-btn-copy" onclick="copyLink()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            링크 복사
+                        </button>
+                        <button class="share-btn share-btn-native" onclick="shareNative('intro')" id="native-share-btn-intro">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                            공유
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="screen quiz-screen" id="quiz-screen">
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span id="progress-text">질문 1/5</span>
+                    <div class="progress-paws" id="progress-paws">
+                        <span class="progress-paw">🐾</span>
+                        <span class="progress-paw">🐾</span>
+                        <span class="progress-paw">🐾</span>
+                        <span class="progress-paw">🐾</span>
+                        <span class="progress-paw">🐾</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <div class="quiz-image-container" id="quiz-image-container">
+                <img src="quiz1.jpg" alt="Quiz Image" class="quiz-image" id="quiz-image">
+                <!-- Clickable overlays for A/B selection -->
+                <div class="image-choice-overlay choice-a" id="choice-overlay-a">
+                    <span class="choice-hint">A 선택 👈</span>
+                </div>
+                <div class="image-choice-overlay choice-b" id="choice-overlay-b">
+                    <span class="choice-hint">👉 B 선택</span>
+                </div>
+            </div>
+
+            <p class="quiz-instruction">👆 이미지에서 원하는 쪽을 클릭하세요!</p>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="screen result-screen" id="result-screen">
+            <div class="result-badge" id="result-badge">🎉 당신의 K-크루 유형은?</div>
+            <h1 class="result-title" id="result-title"></h1>
+            <p class="result-quote" id="result-quote"></p>
+
+            <div class="result-image-container">
+                <img src="" alt="Result Character" class="result-image" id="result-image">
+            </div>
+
+            <div class="result-description">
+                <div class="result-desc-title">
+                    <span>😺</span>
+                    <span>캐릭터 특징</span>
+                </div>
+                <p class="result-desc-text" id="result-desc"></p>
+            </div>
+
+            <div class="result-tip">
+                <div class="result-tip-title">💡 온보딩 팁</div>
+                <p class="result-tip-text" id="result-tip"></p>
+            </div>
+
+            <!-- Result Share Section -->
+            <div class="result-share-section">
+                <p class="share-title">내 결과 공유하기</p>
+                <div class="share-buttons">
+                    <button class="share-btn share-btn-kakao" onclick="shareKakao('result')">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.68 6.71l-.95 3.55c-.08.31.26.56.52.38l4.25-2.82c.49.06.99.09 1.5.09 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                        </svg>
+                        카카오톡
+                    </button>
+                    <button class="share-btn share-btn-copy" onclick="copyLink()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        링크 복사
+                    </button>
+                    <button class="share-btn share-btn-native" onclick="shareNative('result')" id="native-share-btn-result">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        공유
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn btn-restart" onclick="restartQuiz()">
+                다시 하기 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Quiz data
+        const quizData = [
+            {
+                question: "다양한 업무 스타일 중 나와 더 가까운 것은?",
+                image: "quiz1.jpg",
+                choices: [
+                    {
+                        letter: "A",
+                        title: '"속도가 생명!" 🚀',
+                        desc: "일단 빠르게 프로토타입을 만들고 부딪혀보며 수정하는 애자일 행동파"
+                    },
+                    {
+                        letter: "B",
+                        title: '"설계가 생명!" 📐',
+                        desc: "레퍼런스를 충분히 모으고 구조를 탄탄하게 잡은 뒤 시작하는 신중한 계획파"
+                    }
+                ],
+                axis: "X" // X축 질문
+            },
+            {
+                question: "나와 더 가까운 소통 스타일은?",
+                image: "quiz2.jpg",
+                choices: [
+                    {
+                        letter: "A",
+                        title: '"칼답 요정 등장!" ⚡',
+                        desc: "이모지(라이언 따봉)부터 남기고, 즉시 댓글 다는 실시간 소통러"
+                    },
+                    {
+                        letter: "B",
+                        title: '"생각 정리 완료!" 💭',
+                        desc: "내용을 완벽히 이해하고 정리된 답변을 한 번에 남기는 신중한 묵직러"
+                    }
+                ],
+                axis: "X"
+            },
+            {
+                question: "점심시간! 동료들이 묻는다면 나의 선택은?",
+                image: "quiz3.jpg",
+                choices: [
+                    {
+                        letter: "A",
+                        title: '"판교 맛집 도장 깨기!" 🍜',
+                        desc: "새로 생긴 핫플이나 줄 서는 맛집을 검색해서 리드하는 미식 탐험가"
+                    },
+                    {
+                        letter: "B",
+                        title: '"구내식당이 최고!" 🍱',
+                        desc: "이동 시간 아끼고 조용히 쉬면서 에너지를 충전하고 싶은 실속 힐링파"
+                    }
+                ],
+                axis: "Y" // Y축 질문
+            },
+            {
+                question: "기발하지만 실현 가능성이 낮은 아이디어! 나의 반응은?",
+                image: "quiz4.jpg",
+                choices: [
+                    {
+                        letter: "A",
+                        title: '"일단 킵고잉(Keep going)!" 🌟',
+                        desc: "재밌는데요? 어떻게 하면 가능할지 더 이야기해봐요! 가능성을 확장하는 긍정왕"
+                    },
+                    {
+                        letter: "B",
+                        title: '"팩트 체크(Fact Check)!" 📊',
+                        desc: "좋은데, 리소스랑 일정은 괜찮을까요? 리스크를 먼저 점검하는 현실왕"
+                    }
+                ],
+                axis: "X"
+            },
+            {
+                question: "나를 더 성장하게 하는 피드백 스타일은?",
+                image: "quiz5.jpg",
+                choices: [
+                    {
+                        letter: "A",
+                        title: '"역시 OO님 최고!" 💖',
+                        desc: "동료들의 뜨거운 인정과 '함께해서 즐거웠어요'라는 정서적 지지"
+                    },
+                    {
+                        letter: "B",
+                        title: '"이 부분은 이렇게 개선되었네요." 📈',
+                        desc: "내 성장이 구체적인 데이터나 성과로 증명되는 논리적 분석"
+                    }
+                ],
+                axis: "Y"
+            }
+        ];
+
+        // Result types
+        const resultTypes = {
+            "fast-task": {
+                name: "🚀 스피드 레이서 (Speed Racer)",
+                subtitle: "호다닥",
+                quote: '"고민할 시간에 발 도장부터 찍는다냥! 💨"',
+                image: "Type - Speed Racer.jpg",
+                description: "빠른 실행력과 높은 텐션을 가진 유형이에요! 아지트 댓글 속도가 가장 빠르며, 새로운 툴이나 기술이 나오면 제일 먼저 써봐야 직성이 풀려요. 실패를 두려워하지 않고 빠르게 피벗(Pivot)하는 능력이 뛰어나답니다.",
+                tip: "너무 앞서가다가 디테일을 놓칠 수 있어요. 가끔은 '멈춤' 신호를 주는 꼼꼼한 동료와 짝을 이루면 시너지가 폭발합니다!"
+            },
+            "careful-task": {
+                name: "🔭 딥 다이버 (Deep Diver)",
+                subtitle: "몰입",
+                quote: '"잠시만요, 그 문제의 본질부터 파악하고 가실게요. 🤔"',
+                image: "Type - Deep Diver.jpg",
+                description: "말수는 적지만 내뱉는 한 마디가 묵직한 유형이에요! 현상보다는 본질(Why)에 집중하며, 논리적인 근거가 없으면 움직이지 않아요. 완벽한 구조를 설계하는 것을 즐기며, 위기 상황에서도 침착함을 유지해요.",
+                tip: "머릿속에 있는 훌륭한 생각을 텍스트로만 남기기보다, 가끔은 스몰토크로 가볍게 공유해 보세요. 생각보다 많은 크루들이 당신의 인사이트를 기다립니다!"
+            },
+            "fast-people": {
+                name: "🎉 슈퍼 커넥터 (Super Connector)",
+                subtitle: "밍글",
+                quote: '"어서 오라냥! 모든 재미있는 소식은 나를 통한다냥! 📢"',
+                image: "Type - Super Connector.jpg",
+                description: "판교의 모든 맛집을 꿰뚫고 있으며, 타 팀 크루들과도 금방 친해지는 친화력 대장이에요! 회의 분위기가 처질 때쯤 적절한 유머나 간식으로 텐션을 올려요. '이거 누구한테 물어봐야 해요?'라는 질문에 가장 정확한 답을 준답니다.",
+                tip: "넓은 인맥은 큰 자산이지만, 때로는 혼자만의 시간(Focus Time)을 가져보세요. 업무 몰입도가 200% 상승할 거예요!"
+            },
+            "careful-people": {
+                name: "🛡️ 피스 메이커 (Peace Maker)",
+                subtitle: "포근",
+                quote: '"모두의 이야기에 귀 기울여요. 우리 팀의 평화는 내가 지킨다냥! 🛡️"',
+                image: "Type - Peace Maker.jpg",
+                description: "경청 능력이 뛰어나고 모두의 의견을 조율하는 데 탁월해요! 튀지 않지만 묵묵히 제 몫을 다하며, 동료가 힘들어할 때 가장 먼저 알아차리고 챙겨줘요. 팀의 심리적 안전감을 만들어주는 소중한 존재랍니다.",
+                tip: "남을 배려하느라 정작 본인의 의견을 숨길 때가 있어요. 카카오에서는 당신의 목소리도 소중합니다. 조금 더 과감하게 의견을 던져도 괜찮아요!"
+            }
+        };
+
+        // Game state
+        let currentQuestion = 0;
+        let answers = {
+            X: [], // Q1, Q2, Q4 - Fast(A) vs Careful(B)
+            Y: []  // Q3, Q5 - People(A) vs Task(B)
+        };
+
+        function startQuiz() {
+            currentQuestion = 0;
+            answers = { X: [], Y: [] };
+
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+
+            // Setup image click handlers
+            setupImageClickHandlers();
+
+            loadQuestion(0);
+        }
+
+        function setupImageClickHandlers() {
+            const choiceA = document.getElementById('choice-overlay-a');
+            const choiceB = document.getElementById('choice-overlay-b');
+
+            choiceA.onclick = (e) => {
+                createRippleEffect(e, choiceA);
+                selectAnswer('A', currentQuestion);
+            };
+
+            choiceB.onclick = (e) => {
+                createRippleEffect(e, choiceB);
+                selectAnswer('B', currentQuestion);
+            };
+        }
+
+        function createRippleEffect(e, element) {
+            const rect = element.getBoundingClientRect();
+            const ripple = document.createElement('div');
+            ripple.className = 'click-ripple';
+            ripple.style.left = (e.clientX - rect.left - 50) + 'px';
+            ripple.style.top = (e.clientY - rect.top - 50) + 'px';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function loadQuestion(index) {
+            const quiz = quizData[index];
+
+            // Update progress
+            document.getElementById('progress-text').textContent = `질문 ${index + 1}/5`;
+            document.getElementById('progress-fill').style.width = `${(index + 1) * 20}%`;
+
+            // Update progress paws
+            const paws = document.querySelectorAll('.progress-paw');
+            paws.forEach((paw, i) => {
+                if (i < index) {
+                    paw.classList.add('filled');
+                } else {
+                    paw.classList.remove('filled');
+                }
+            });
+
+            // Update image with animation
+            const imageContainer = document.getElementById('quiz-image-container');
+            imageContainer.style.animation = 'none';
+            imageContainer.offsetHeight; // Trigger reflow
+            imageContainer.style.animation = 'bounceIn 0.6s ease-out';
+
+            document.getElementById('quiz-image').src = quiz.image;
+            document.getElementById('quiz-question').textContent = quiz.question;
+
+            // Update choices
+            const choicesContainer = document.getElementById('choices-container');
+            choicesContainer.innerHTML = quiz.choices.map((choice, i) => `
+                <button class="choice-btn" onclick="selectAnswer('${choice.letter}', ${index})">
+                    <div class="choice-label">
+                        <span class="choice-letter">${choice.letter}</span>
+                        <div class="choice-text">
+                            <div class="choice-title">${choice.title}</div>
+                            <div class="choice-desc">${choice.desc}</div>
+                        </div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function selectAnswer(answer, questionIndex) {
+            const quiz = quizData[questionIndex];
+            answers[quiz.axis].push(answer);
+
+            // Mark current paw as filled
+            const paws = document.querySelectorAll('.progress-paw');
+            paws[questionIndex].classList.add('filled');
+
+            if (currentQuestion < 4) {
+                currentQuestion++;
+                setTimeout(() => loadQuestion(currentQuestion), 300);
+            } else {
+                setTimeout(showResult, 500);
+            }
+        }
+
+        function calculateResult() {
+            // X축: A가 많으면 Fast, B가 많으면 Careful
+            const xCount = answers.X.filter(a => a === 'A').length;
+            const xType = xCount >= 2 ? 'fast' : 'careful';
+
+            // Y축: A가 많으면 People, B가 많으면 Task
+            const yCount = answers.Y.filter(a => a === 'A').length;
+            const yType = yCount >= 1 ? 'people' : 'task';
+
+            return `${xType}-${yType}`;
+        }
+
+        function showResult() {
+            const resultKey = calculateResult();
+            const result = resultTypes[resultKey];
+
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            document.getElementById('result-title').textContent = result.name;
+            document.getElementById('result-quote').textContent = result.quote;
+            document.getElementById('result-image').src = result.image;
+            document.getElementById('result-desc').textContent = result.description;
+            document.getElementById('result-tip').textContent = result.tip;
+
+            // Trigger confetti
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#FFE566', '#FFB5A7', '#B8E0D4', '#A7D1F0', '#FFD6CF'];
+            const confettiContainer = document.createElement('div');
+            confettiContainer.className = 'confetti';
+            document.body.appendChild(confettiContainer);
+
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + 'vw';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 2 + 's';
+                piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confettiContainer.appendChild(piece);
+            }
+
+            setTimeout(() => {
+                confettiContainer.remove();
+            }, 5000);
+        }
+
+        function restartQuiz() {
+            document.getElementById('result-screen').classList.remove('active');
+            document.getElementById('intro-screen').classList.add('active');
+
+            // Reset progress paws
+            const paws = document.querySelectorAll('.progress-paw');
+            paws.forEach(paw => paw.classList.remove('filled'));
+        }
+
+        // ==================== Share Functions ====================
+
+        let currentResultKey = null;
+
+        // Override showResult to store the result key
+        const originalShowResult = showResult;
+        showResult = function() {
+            currentResultKey = calculateResult();
+            originalShowResult();
+        };
+
+        // Show result from URL parameter (for shared links)
+        function showResultFromParam(resultKey) {
+            const result = resultTypes[resultKey];
+            if (!result) return false;
+
+            currentResultKey = resultKey;
+
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            document.getElementById('result-title').textContent = result.name;
+            document.getElementById('result-quote').textContent = result.quote;
+            document.getElementById('result-image').src = result.image;
+            document.getElementById('result-desc').textContent = result.description;
+            document.getElementById('result-tip').textContent = result.tip;
+
+            createConfetti();
+            return true;
+        }
+
+        // Check URL parameter on page load
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const resultParam = urlParams.get('result');
+            if (resultParam && resultTypes[resultParam]) {
+                showResultFromParam(resultParam);
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Copy link to clipboard
+        async function copyLink() {
+            const baseUrl = window.location.href.split('?')[0];
+            // 결과 화면에서는 결과 파라미터 포함
+            const url = currentResultKey ? `${baseUrl}?result=${currentResultKey}` : baseUrl;
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast('링크가 복사되었어요! 🎉');
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('링크가 복사되었어요! 🎉');
+            }
+        }
+
+        // Native Web Share API
+        async function shareNative(type) {
+            if (!navigator.share) {
+                showToast('이 브라우저에서는 지원되지 않아요 😿');
+                return;
+            }
+
+            const baseUrl = window.location.href.split('?')[0];
+            let shareData;
+
+            if (type === 'intro') {
+                shareData = {
+                    title: 'Hello, New Krew! 🐱',
+                    text: '나의 카카오 유니버스 적응 유형을 찾아보세요! 5개의 밸런스 게임으로 알아보는 K-크루 캐릭터 테스트',
+                    url: baseUrl
+                };
+            } else {
+                const result = resultTypes[currentResultKey];
+                const typeName = result ? result.name.replace(/[🚀🔭🎉🛡️]/g, '').trim() : '나의 K-크루 유형';
+                const resultUrl = `${baseUrl}?result=${currentResultKey}`;
+                shareData = {
+                    title: `나의 K-크루 유형: ${typeName}`,
+                    text: result ? `${result.quote} - 나의 카카오 유니버스 적응 유형을 알아봤어요! 당신도 테스트해보세요!` : '나의 K-크루 유형을 확인해보세요!',
+                    url: resultUrl
+                };
+            }
+
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showToast('공유에 실패했어요 😿');
+                }
+            }
+        }
+
+        // ==================== Kakao Share ====================
+        // 카카오 JavaScript 앱 키 설정 (https://developers.kakao.com 에서 발급)
+        const KAKAO_APP_KEY = '06d033ac1b0959d3d1d486b9ef0c19ff';
+
+        // 페이지 로드 시 Kakao SDK 초기화
+        function initKakaoSDK() {
+            if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+                if (KAKAO_APP_KEY) {
+                    Kakao.init(KAKAO_APP_KEY);
+                    console.log('Kakao SDK initialized:', Kakao.isInitialized());
+                }
+            }
+        }
+
+        // Kakao SDK 로드
+        function loadKakaoSDK(callback) {
+            if (typeof Kakao !== 'undefined') {
+                if (callback) callback();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.7/kakao.min.js';
+            script.integrity = 'sha384-tJkjbtDbvoxO+diRuDtwRO9JXR7pjWnfjfRn5ePUpl7e7RJCxKCwwnfqUAdXh53p';
+            script.crossOrigin = 'anonymous';
+            script.onload = () => {
+                initKakaoSDK();
+                if (callback) callback();
+            };
+            document.head.appendChild(script);
+        }
+
+        // 카카오톡 공유
+        function shareKakao(type) {
+            if (typeof Kakao === 'undefined') {
+                loadKakaoSDK(() => shareKakaoMessage(type));
+                return;
+            }
+            shareKakaoMessage(type);
+        }
+
+        // 카카오톡 공유용 이미지 CDN URL (외부 접근 가능한 URL)
+        const SHARE_IMAGE_BASE_URL = 'https://t1-sandbox.kakaocdn.net/june_kim_test_public/onboarding-balance-game/';
+
+        function shareKakaoMessage(type) {
+            let baseUrl = window.location.href.split('?')[0];
+            // URL이 /로 끝나지 않으면 마지막 경로 요소 제거 (index.html 등)
+            if (!baseUrl.endsWith('/')) {
+                baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+            }
+
+            // 앱 키가 없거나 SDK가 초기화되지 않은 경우 클립보드 복사로 대체
+            if (!KAKAO_APP_KEY || typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
+                copyShareMessage(type, baseUrl);
+                return;
+            }
+
+            // Kakao SDK로 공유
+            try {
+                if (type === 'intro') {
+                    const introImageUrl = SHARE_IMAGE_BASE_URL + 'intro.jpg';
+                    Kakao.Share.sendDefault({
+                        objectType: 'feed',
+                        content: {
+                            title: 'Hello, New Krew!',
+                            description: '나의 카카오 유니버스 적응 유형을 찾아보세요! 5개의 밸런스 게임으로 알아보는 K-크루 캐릭터 테스트',
+                            imageUrl: introImageUrl,
+                            link: {
+                                mobileWebUrl: baseUrl,
+                                webUrl: baseUrl
+                            }
+                        },
+                        buttons: [
+                            {
+                                title: '테스트 하러 가기',
+                                link: {
+                                    mobileWebUrl: baseUrl,
+                                    webUrl: baseUrl
+                                }
+                            }
+                        ]
+                    });
+                } else {
+                    const result = resultTypes[currentResultKey];
+                    const resultUrl = `${baseUrl}?result=${currentResultKey}`;
+                    // 이미지 파일명에 공백이 있으므로 URL 인코딩 필요
+                    const resultImageUrl = SHARE_IMAGE_BASE_URL + encodeURIComponent(result ? result.image : 'intro.jpg');
+                    Kakao.Share.sendDefault({
+                        objectType: 'feed',
+                        content: {
+                            title: result ? result.name : '나의 K-크루 유형',
+                            description: result ? result.quote.replace(/"/g, '') : '나의 카카오 유니버스 적응 유형을 확인해보세요!',
+                            imageUrl: resultImageUrl,
+                            link: {
+                                mobileWebUrl: resultUrl,
+                                webUrl: resultUrl
+                            }
+                        },
+                        buttons: [
+                            {
+                                title: '나도 테스트하기',
+                                link: {
+                                    mobileWebUrl: resultUrl,
+                                    webUrl: resultUrl
+                                }
+                            }
+                        ]
+                    });
+                }
+            } catch (err) {
+                console.error('Kakao Share error:', err);
+                copyShareMessage(type, baseUrl);
+            }
+        }
+
+        // 클립보드 복사 fallback
+        function copyShareMessage(type, baseUrl) {
+            let shareText;
+            if (type === 'intro') {
+                shareText = `🐱 나의 카카오 유니버스 적응 유형을 찾아보세요!\n\n5개의 밸런스 게임으로 알아보는 K-크루 캐릭터 테스트\n\n${baseUrl}`;
+            } else {
+                const result = resultTypes[currentResultKey];
+                const typeName = result ? result.name : '나의 K-크루 유형';
+                const resultUrl = `${baseUrl}?result=${currentResultKey}`;
+                shareText = `🐱 나의 K-크루 유형: ${typeName}\n${result ? result.quote : ''}\n\n테스트 해보기: ${resultUrl}`;
+            }
+
+            navigator.clipboard.writeText(shareText).then(() => {
+                showToast('공유 메시지가 복사되었어요! 카카오톡에 붙여넣기 해주세요 📋');
+            }).catch(() => {
+                const textArea = document.createElement('textarea');
+                textArea.value = shareText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('공유 메시지가 복사되었어요! 카카오톡에 붙여넣기 해주세요 📋');
+            });
+        }
+
+        // Hide native share button if not supported & check URL params
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for result parameter in URL (shared links)
+            checkUrlParams();
+
+            if (!navigator.share) {
+                const nativeShareBtns = document.querySelectorAll('.share-btn-native');
+                nativeShareBtns.forEach(btn => {
+                    btn.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
